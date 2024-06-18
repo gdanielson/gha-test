@@ -1,0 +1,35 @@
+name: Code testing on branch dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U setuptools pip
+          python -m pip install -r ./src/requirements.txt
+          python -m pip install pytest junitxml
+
+      - name: Run tests with pytest and generate JUnit report
+        run: |
+          python -m pytest ./tests --junitxml=pytest_report.xml
+
+      - name: Upload pytest report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-reports
+          path: pytest_report.xml
+        if: ${{ always() }}
