@@ -4,6 +4,9 @@ on:
   schedule:
     # Run every 6 hours
     - cron: "0 */6 * * *"
+  pull_request:
+    types:
+      - closed
   workflow_dispatch:
     inputs:
       dry_run:
@@ -19,7 +22,7 @@ on:
 jobs:
   run-python-script:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} && ${{ github.event.pull_request.merged == true }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
